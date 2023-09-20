@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Lógica para el botón "Descarga"
+    
     document.getElementById('botonDescarga').addEventListener('click', async function() {
         const sizeValue = parseInt(document.getElementById('textoDescarga').value, 10);
         
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch(apiUrl);
             const data = await response.text();
             
-            // Crear un blob con los datos y un enlace para descargar
+            /
             const blob = new Blob([data], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Lógica para el botón "Enviar"
+    
     document.getElementById('boton2').addEventListener('click', function() {
         const fileInput = document.getElementById('fileInputDescarga');
         const file = fileInput.files[0];
