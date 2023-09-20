@@ -1,7 +1,7 @@
 document.getElementById('boton1').addEventListener('click', async function() {
     const sizeValue = document.getElementById('texto').value;
-    if (!sizeValue || isNaN(sizeValue)) {
-        alert('Por favor, introduce un número válido en el cuadro de texto.');
+    if (isNaN(sizeValue) || sizeValue < 1 || sizeValue > 100) {
+        alert('Por favor, introduce un número entero válido entre 1 y 100 en el cuadro de texto.');
         return;
     }
     
