@@ -75,18 +75,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
 
-            
-            const dataString = '[' + formattedDataArray.join(',') + ']';
-            console.log(dataString)
-
-            
+        
+            const dataString = eval('(' + formattedDataArray.join(',') + ')');
+        
+          
             try {
                 const response = await fetch("https://8j5baasof2.execute-api.us-west-2.amazonaws.com/production/tests/trucode/items", {
                     method: 'POST',
                     body: JSON.stringify(dataString),
                     headers: {
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    redirect: 'follow'
                 });
 
                 if (!response.ok) {
