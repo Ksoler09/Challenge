@@ -54,35 +54,61 @@ document.addEventListener('DOMContentLoaded', function() {
         return str;
     };
 
-    document.getElementById('boton2').addEventListener('click', async function() {
-        const file = fileInputCarga.files[0];
-        if (!file) {
-            alert('Por favor, carga el archivo contactos.csv primero.');
-            return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = async function(event) {
-            const text = event.target.result;
-            
-            const lines = text.trim().split('\n');
-            const formattedDataArray = lines.map(line => {
-                const [name, phone, email] = line.split(',');
-                return objectToString({
-                    name: name, 
-                    email: email, 
-                    phone: phone 
-                });
-            });
 
+const formatPhoneNumber = (phone) => {
+    let cleaned = ('' + phone).replace(/\D/g, '');  
+
+    
+    while (cleaned.length < 10) {
+        cleaned = '0' + cleaned;
+    }
+
+    
+    if (cleaned.length > 10) {
+        cleaned = cleaned.substring(0, 10);
+    }
+
+    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+        return [match[1], match[2], match[3]].join('-');
+    }
+    return null;
+}
+
+
+document.getElementById('boton2').addEventListener('click', async function() {
+    const file = fileInputCarga.files[0];
+    if (!file) {
+        alert('Por favor, carga el archivo contactos.csv primero.');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = async function(event) {
+        const text = event.target.result;
         
-            const dataString = eval('(' + formattedDataArray.join(',') + ')');
-        
-          
+        const lines = text.trim().split('\n');
+        const formattedDataArray = lines.map(line => {
+            const [name, phone, email] = line.split(',');
+            const formattedPhone = formatPhoneNumber(phone.trim());
+            if (!formattedPhone) {
+                alert(`El número de teléfono ${phone.trim()} no tiene el formato correcto.`);
+                return null;
+            }
+            return {
+                name: name.trim(), 
+                email: email.trim(), 
+                phone: formattedPhone
+            };
+        }).filter(Boolean);
+
+        const dataString = formattedDataArray.map(data => JSON.stringify(data));
+
+        for (const record of dataString) {
             try {
                 const response = await fetch("https://8j5baasof2.execute-api.us-west-2.amazonaws.com/production/tests/trucode/items", {
                     method: 'POST',
-                    body: JSON.stringify(dataString),
+                    body: record,
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -95,13 +121,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const responseData = await response.json();
                 console.log(responseData);
-                alert('Datos enviados con éxito!');
             } catch (error) {
-                alert('Error al realizar la petición POST: ' + error.message);
+                alert('Error al realizar la petición POST para el registro ' + record + ': ' + error.message);
+                break;
             }
-        };
-        
-        reader.readAsText(file);
+        }
+        alert('Datos enviados con éxito!');
+    };
+    
+    reader.readAsText(file);
+
+
     });
+   
 
 });
